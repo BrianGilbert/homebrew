@@ -37,6 +37,7 @@ class Nginx < Formula
   option 'with-xslt', 'Compile with XSLT module'
   # Additional
   option 'with-passenger', 'Compile with support for Phusion Passenger module'
+  option 'with-upload-progress',  'Compile with support for Upload Progress module'
 
   depends_on 'pcre'
   # SPDY needs openssl >= 1.0.1 for NPN; see:
@@ -114,6 +115,14 @@ class Nginx < Formula
     args << "--with-http_xslt_module" if build.include? 'with-xslt'
     # Additional
     args << passenger_config_args if build.include? 'with-passenger'
+    if build.include? 'with-upload-progress'
+      `mkdir /tmp/nginx_upload-progress`
+      `cd /tmp/ && wget http://github.com/downloads/masterzen/nginx-upload-progress-module/nginx_uploadprogress_module-0.9.0.tar.gz`
+      `tar xzf /tmp/nginx_uploadprogress_module-0.9.0.tar.gz --directory /tmp/nginx_upload-progress --strip 1`
+      `rm nginx_uploadprogress_module-0.9.0.tar.gz`
+
+      args << "--add-module=/tmp/nginx_upload-progress"
+    end
 
     if build.head?
       system "./auto/configure", *args
